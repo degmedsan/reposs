@@ -5,14 +5,15 @@
 <form method="get" class="form-check-inline">
 	<div class="form-group">
 		<label for="estado">Estado:</label>
-		@Html.DropDownList("estado", (SelectList)ViewBag.Estados, new { @class = "form-control" })
+		@Html.DropDownList("estado", (SelectList)ViewBag.Estados, new { @class = "form-control" } )
 	</div>
-
+	<br />
+	<button type="submit" class="btn btn-primary">Buscar</button>
 </form>
 
 <div>
 	<br />
-	<button type="submit" class="btn btn-primary">Buscar</button>
+	
 	<a href="@Url.Action("Create","Venta")" class="btn btn-success">Crear Venta</a>
 	<a asp-controller="Venta" asp-action="ReporteVentas" class="btn btn-dark">Generar Reporte venta</a>
 

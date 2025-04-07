@@ -5,12 +5,13 @@
 		<label for="estado">Estado:</label>
 		@Html.DropDownList("estado",(SelectList)ViewBag.Estados,new {@class = "form-control"})
 	</div>
-	
+	<br />
+	<button type="submit" class="btn btn-primary">Buscar</button>
+
 </form>
 
 <div>
 	<br />
-	<button type="submit" class="btn btn-primary">Buscar</button>
 	<a href="@Url.Action("Create","Compra")" class="btn btn-success">Crear Compra</a>
 	<a asp-controller="Compra" asp-action="ReporteCompras" class="btn btn-dark">Generar Reporte compra</a>
 	
