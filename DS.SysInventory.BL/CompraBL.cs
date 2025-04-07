@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DS.SysInventory.DAL;
 using DS.SysInventory.EN;
+using DS.SysInventory.EN.Filtros;
 
 namespace DS.SysInventory.BL
 {
@@ -36,6 +37,10 @@ namespace DS.SysInventory.BL
         public async Task<List<Compra>> ObtenerPorEstadoAsync(byte estado)
         {
             return await compraDAL.ObtenerPorEstadoAsync (estado);
+        }
+        public async Task<List<Compra>> ObtenerReporteComprasAsync(CompraFiltros filtro)
+        {
+            return await compraDAL.ObtenerReporteComprasAsync (filtro);
         }
     }
 }

@@ -16,8 +16,14 @@ builder.Services.AddScoped<ProductoBL>();
 builder.Services.AddScoped<ProveedorDAL>();
 builder.Services.AddScoped<ProveedorBL>();
 
+builder.Services.AddScoped<ClienteDAL>();
+builder.Services.AddScoped<ClienteBL>();
+
 builder.Services.AddScoped<CompraDAL>();
 builder.Services.AddScoped<CompraBL>();
+
+builder.Services.AddScoped<VentaDAL>();
+builder.Services.AddScoped<VentaBL>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;

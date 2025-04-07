@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DS.SysInventory.EN;
+using DS.SysInventory.EN.Filtros;
 
 namespace DS.SysInventory.DAL
 {
@@ -98,6 +99,28 @@ namespace DS.SysInventory.DAL
             return compras ?? new List<Compra> ();
 
         }
+        public async Task<List<Compra>> ObtenerReporteComprasAsync(CompraFiltros filtro)
+        {
+            var comprasQuery = dbContext.Compras
+                .Include(c => c.DetalleCompras)
+                    .ThenInclude(dc => dc.Producto)
+                .Include(c => c.Proveedor)
+                .AsQueryable();
+
+            if (filtro.FechaInicio.HasValue)
+            {
+                DateTime fechaInicio = filtro.FechaInicio.Value.Date; //Eliminar la hora, deja solo la fecha
+                comprasQuery = comprasQuery.Where(c => c.FechaCompra >= fechaInicio);
+            }
+
+            if (filtro.FechaFin.HasValue)
+            { 
+                DateTime fechaFin = filtro.FechaFin.Value.Date.AddDays(1).AddSeconds(-1); //incluirhasta  el final el dia
+                comprasQuery = comprasQuery.Where(c => c.FechaCompra <= fechaFin);
+            }
+
+            return await comprasQuery.ToListAsync ();
+        } 
     }
 }
  

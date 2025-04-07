@@ -1,26 +1,26 @@
-﻿@model DS.SysInventory.EN.Compra
+﻿@model DS.SysInventory.EN.Venta
 
 @{
-	ViewData["Title"] = "Crear Compra";
+	ViewData["Title"] = "Crear Venta";
 	var productos = ViewBag.Productos as List<Producto>;
 }
 
 <div class="container mt-4">
 	<div class="card shadow-sm border-0">
 		<div class="card-header bg-dark text-white text-center">
-			<h3 class="mb-0"> Factura de Compra</h3>
+			<h3 class="mb-0"> Factura de Venta</h3>
 		</div>
 		<div class="card-body">
-			<form asp-action ="Create" method="post">
+			<form asp-action="Create" method="post">
 
 				<!-- SELECCION DEL PROVEEDOR -->
 				<div class="mb-3">
-					<label class="form-label fw-bold">Proveedor</label> 
-					<select id="ProveedorId" name="IdProveedor" class="form-select" required>
-						<option value ="">Seleccione un proveedor</option>
-						@foreach (var item in ViewBag.Proveedores)
+					<label class="form-label fw-bold">Cliente</label>
+					<select id="ClienteId" name="IdCliente" class="form-select" required>
+						<option value="">Seleccione un cliente</option>
+						@foreach (var item in ViewBag.Clientes)
 						{
-							<option value ="@item.Value">@item.Text</option>
+							<option value="@item.Value">@item.Text</option>
 						}
 					</select>
 				</div>
@@ -41,19 +41,19 @@
 						</div>
 						<div class="col-md-2">
 							<label class="form-label">Cantidad</label>
-							<input type="number" id="cantidadSeleccionada" class="form-control" min="1" value="1" >
+							<input type="number" id="cantidadSeleccionada" class="form-control" min="1" value="1">
 						</div>
 						<div class="col-md-2">
 							<label class="form-label">Precio</label>
-							<input type="text" id="precioSeleccionado" class="form-control text-end" readonly >
+							<input type="text" id="precioSeleccionado" class="form-control text-end" readonly>
 						</div>
 						<div class="col-md-2">
 							<label class="form-label">Stock</label>
-							<input type="text" id="stockSeleccionado" class="form-control text-center" readonly >
+							<input type="text" id="stockSeleccionado" class="form-control text-center" readonly>
 						</div>
 						<div class="col-md-2">
 							<label class="form-label">Subtotal</label>
-							<input type="text" id="subtotalSeleccionado" class="form-control text-end bg-light fw-bold" readonly >
+							<input type="text" id="subtotalSeleccionado" class="form-control text-end bg-light fw-bold" readonly>
 						</div>
 						<div class="col-md-12 mt-2 text-end">
 							<button type="button" id="agregarProductos" class="btn btn-success shadow-sm">
@@ -86,21 +86,21 @@
 				<!--TOTAL-->
 				<div class="text-end mt-3">
 					<label class="h4 fw-bold text-primary">Total: </label>
-					<input type="text" id="total" name="Total" class="form-control fw-bold text-end text-white bg-primary"readonly >
+					<input type="text" id="total" name="Total" class="form-control fw-bold text-end text-white bg-primary" readonly>
 				</div>
 
 				<!--BOTON GUARDAR-->
 				<div class="text-center mt-3">
 					<button type="submit" class="btn btn-primary btn-lg shadow-sm">
-						Guardar Compra
+						Guardar Venta
 					</button>
-				</div> 
+				</div>
 			</form>
 		</div>
 	</div>
 </div>
 
-@section Scripts{
+@section Scripts {
 	<script>
 		let index = 0;
 
@@ -133,15 +133,15 @@
 				alert("Seleccione un producto y verifique los valores.");
 				return;
 			}
-				
+
 			let tbody = document.querySelector("#tablaProductos");
 			let tr =document.createElement("tr");
 
 			tr.innerHTML = `
-						<td>${nombreProducto}<input type="hidden" name="DetalleCompras[${index}].IdProducto" value="${idProducto}"></td>
-						<td class="text-center"><input type="number" name="DetalleCompras[${index}].Cantidad" class="form-control cantidad text-center" min="1" value="${cantidad}"></td>
-						<td class="text-end"><input type ="text" name="DetalleCompras[${index}].PrecioUnitariio" class="form-control precio text-end" value="${precio}"></td>
-						<td class="text-end"><input type ="text" name="DetalleCompras[${index}].Subtotal" class="form-control subtotal text-end fw-bold" value="${subtotal}" readonly></td>
+						<td>${nombreProducto}<input type="hidden" name="DetalleVentas[${index}].IdProducto" value="${idProducto}"></td>
+						<td class="text-center"><input type="number" name="DetalleVentas[${index}].Cantidad" class="form-control cantidad text-center" min="1" value="${cantidad}"></td>
+						<td class="text-end"><input type ="text" name="DetalleVentas[${index}].PrecioUnitariio" class="form-control precio text-end" value="${precio}"></td>
+						<td class="text-end"><input type ="text" name="DetalleVentas[${index}].Subtotal" class="form-control subtotal text-end fw-bold" value="${subtotal}" readonly></td>
 						<td class="text-center"><button type="button" class="btn btn-danger btnEliminar">X</button></td>
 			`;
 
@@ -149,7 +149,7 @@
 			index++;
 			calcularTotal();
 		});
-		
+
 		document.addEventListener("click", function (event) {
 			if (event.target.classList.contains("btnEliminar")) {
 				event.target.closest("tr").remove();

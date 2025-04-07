@@ -4,30 +4,30 @@ using Microsoft.AspNetCore.Mvc;
 using DS.SysInventory.BL;
 using DS.SysInventory.DAL;
 using DS.SysInventory.EN;
-using static DS.SysInventory.EN.Compra;
+using static DS.SysInventory.EN.Venta;
 using OfficeOpenXml;
 using Rotativa.AspNetCore;
 using DS.SysInventory.EN.Filtros;
-using static DS.SysInventory.EN.Filtros.CompraFiltros;
+using static DS.SysInventory.EN.Filtros.VentaFiltros;
 
 namespace DS.SysInventory.AppWeb.Controllers
 {
-    public class CompraController : Controller
+    public class VentaController : Controller
     {
-        readonly ProveedorBL proveedorBL;
-        readonly CompraBL compraBL;
+        readonly ClienteBL clienteBL;
+        readonly VentaBL ventaBL;
         readonly ProductoBL productoBL;
 
-        public CompraController(ProveedorBL pProveedorBL, CompraBL pCompraBL, ProductoBL pProductoBL)
+        public VentaController(ClienteBL pClienteBL, VentaBL pVentaBL, ProductoBL pProductoBL)
         {
-            proveedorBL = pProveedorBL;
-            compraBL = pCompraBL;
+            clienteBL = pClienteBL;
+            ventaBL = pVentaBL;
             productoBL = pProductoBL;
         }
         // GET: CompraController
         public async Task<IActionResult> Index(byte? estado)
         {
-            var compras = await compraBL.ObtenerPorEstadoAsync(estado ?? 0);
+            var ventas = await ventaBL.ObtenerPorEstadoAsync(estado ?? 0);
 
             var estados = new List<SelectListItem>
             {
@@ -38,10 +38,10 @@ namespace DS.SysInventory.AppWeb.Controllers
 
             ViewBag.Estados = new SelectList(estados, "Value", "Text", estado?.ToString());
 
-            return View(compras);
+            return View(ventas);
         }
 
-        // GET: CompraController/Details/5
+        // GET: VentaController/Details/5
         public ActionResult Details(int id)
         {
             return View();
@@ -50,22 +50,21 @@ namespace DS.SysInventory.AppWeb.Controllers
         // GET: CompraController/Create
         public async Task<IActionResult> Create()
         {
-            ViewBag.Proveedores = new SelectList(await proveedorBL.ObtenerTodosAsync(), "Id", "Nombre");
+            ViewBag.Clientes = new SelectList(await clienteBL.ObtenerTodosAsync(), "Id", "Nombre");
             ViewBag.Productos = await productoBL.ObtenerTodosAsync();
 
             return View();
         }
-
         // POST: CompraController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(Compra compra)
+        public async Task<ActionResult> Create(Venta venta)
         {
             try
             {
-                compra.Estado = (byte)EnumEstadoCompra.Activa;
-                compra.FechaCompra = DateTime.Now;
-                await compraBL.CrearAsync(compra);
+                venta.Estado = (byte)EnumEstadoVenta.Activa;
+                venta.FechaVenta = DateTime.Now;
+                await ventaBL.CrearAsync(venta);
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -74,13 +73,13 @@ namespace DS.SysInventory.AppWeb.Controllers
             }
         }
 
-        // GET: CompraController/Edit/5
+        // GET: VentaController/Edit/5
         public ActionResult Edit(int id)
         {
             return View();
         }
 
-        // POST: CompraController/Edit/5
+        // POST: VentaController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, IFormCollection collection)
@@ -95,13 +94,13 @@ namespace DS.SysInventory.AppWeb.Controllers
             }
         }
 
-        // GET: CompraController/Delete/5
+        // GET: VentaController/Delete/5
         public ActionResult Delete(int id)
         {
             return View();
         }
 
-        // POST: CompraController/Delete/5
+        // POST: VentaController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)
@@ -118,50 +117,50 @@ namespace DS.SysInventory.AppWeb.Controllers
 
         public async Task<IActionResult> Anular(int id)
         {
-            var compra = await compraBL.ObtenerPorIdAsync(id);
-            if (compra == null)
+            var venta = await ventaBL.ObtenerPorIdAsync(id);
+            if (venta == null)
             {
                 return NotFound();
             }
-            await compraBL.AnularAsync(id);
+            await ventaBL.AnularAsync(id);
 
             return RedirectToAction("Index");
         }
 
-        public async Task<IActionResult> ReporteComprasExcel(List<Compra> compras)
+        public async Task<IActionResult> ReporteVentasExcel(List<Venta> ventas)
         {
             using (var package = new ExcelPackage())
             {
-                var hojaExcel = package.Workbook.Worksheets.Add("Reporte Compras");
+                var hojaExcel = package.Workbook.Worksheets.Add("Reporte Ventas");
 
                 //Encabezados
-                hojaExcel.Cells["A1"].Value = "Fecha de Compra";
-                hojaExcel.Cells["B1"].Value = "CLiente";
+                hojaExcel.Cells["A1"].Value = "Fecha de Venta";
+                hojaExcel.Cells["B1"].Value = "Cliente";
                 hojaExcel.Cells["C1"].Value = "Producto";
                 hojaExcel.Cells["D1"].Value = "Cantidad";
                 hojaExcel.Cells["E1"].Value = "Subtotal";
-                hojaExcel.Cells["F1"].Value = "Total de la Compra";
+                hojaExcel.Cells["F1"].Value = "Total de la Venta";
 
                 int row = 2;
                 int totalCantidad = 0;
                 decimal totalSubtotal = 0;
                 decimal totalGeneral = 0;
 
-                foreach (var compra in compras)
+                foreach (var venta in ventas)
                 {
-                    foreach (var detalle in compra.DetalleCompras)
+                    foreach (var detalle in venta.DetalleVentas)
                     {
-                        hojaExcel.Cells[row, 1].Value = compra.FechaCompra.ToString("yyyy-MM-dd");
-                        hojaExcel.Cells[row, 2].Value = compra.Proveedor?.Nombre ?? "N/A";
+                        hojaExcel.Cells[row, 1].Value = venta.FechaVenta.ToString("yyyy-MM-dd");
+                        hojaExcel.Cells[row, 2].Value = venta.Cliente?.Nombre ?? "N/A";
                         hojaExcel.Cells[row, 3].Value = detalle.Producto?.Nombre ?? "N/A";
                         hojaExcel.Cells[row, 4].Value = detalle.Cantidad;
                         hojaExcel.Cells[row, 5].Value = detalle.SubTotal;
-                        hojaExcel.Cells[row, 6].Value = compra.Total;
+                        hojaExcel.Cells[row, 6].Value = venta.Total;
 
                         //Acumular totales
                         totalCantidad += detalle.Cantidad;
                         totalSubtotal += detalle.SubTotal;
-                        totalGeneral += compra.Total;
+                        totalGeneral += venta.Total;
 
                         row++;
                     }
@@ -170,41 +169,42 @@ namespace DS.SysInventory.AppWeb.Controllers
                 hojaExcel.Cells[row, 3].Value = "Totales";
                 hojaExcel.Cells[row, 4].Value = totalCantidad;
                 hojaExcel.Cells[row, 5].Value = totalSubtotal;
-                hojaExcel.Cells[row, 6].Value= totalGeneral;
+                hojaExcel.Cells[row, 6].Value = totalGeneral;
 
                 //Negrita parala fla de totales
                 hojaExcel.Cells[row, 3, row, 6].Style.Font.Bold = true;
 
                 hojaExcel.Cells["A:F"].AutoFitColumns();
 
-                var stream = new MemoryStream();                    
+                var stream = new MemoryStream();
                 package.SaveAs(stream);
                 stream.Position = 0;
-                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ReporteComprasExcel.xlsx");
+                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ReporteVentasExcel.xlsx");
 
             }
         }
-
         [HttpGet]
-        public async Task<IActionResult> DescargarReporte(CompraFiltros filtro)
+        public async Task<IActionResult> DescargarReporte(VentaFiltros filtro)
         {
-            var compras = await compraBL.ObtenerReporteComprasAsync(filtro);
+            var ventas = await ventaBL.ObtenerReporteVentasAsync(filtro);
 
             if (filtro.TipoReporte == (byte)EnumTipoReporte.PDF)
             {
-                return new ViewAsPdf("rpCompras", compras);
+                return new ViewAsPdf("rpVentas", ventas);
             }
             else if (filtro.TipoReporte == (byte)EnumTipoReporte.Excel)
             {
-                return await ReporteComprasExcel(compras);
+                return await ReporteVentasExcel(ventas);
             }
             return BadRequest("Formato no valido");
         }
 
         [HttpGet]
-        public IActionResult ReporteCompras()
+        public IActionResult ReporteVentas()
         {
             return View();
+
         }
+
     }
 }
